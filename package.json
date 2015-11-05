@@ -1,0 +1,26 @@
+{
+  "name": "node-masthead-injector",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "./node_modules/.bin/babel-node --harmony .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sky-uk/node-masthead-injector.git"
+  },
+  "author": "Sam Warren",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sky-uk/node-masthead-injector/issues"
+  },
+  "homepage": "https://github.com/sky-uk/node-masthead-injector",
+  "dependencies": {
+    "lodash": "^3.10.1",
+    "node-babel": "^0.1.2",
+    "promise": "^7.0.4",
+    "request-promise": "^1.0.2"
+  }
+}
