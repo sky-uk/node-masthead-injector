@@ -1,6 +1,6 @@
-import injector from './app.js';
+import masthead from './masthead.js';
 
-injector.get()
+masthead.get()
   .then(function(assets) {
-    console.log(assets);
+    console.log(SKY_MASTHEAD);
   });

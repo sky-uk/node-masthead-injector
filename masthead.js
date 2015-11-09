@@ -25,6 +25,8 @@ const injector = {
   _init: function() {
     this.setConfig();
 
+    GLOBAL.SKY_MASTHEAD = null;
+
     console.log('MASTHEAD - Initialising');
   },
 
@@ -44,6 +46,7 @@ const injector = {
     console.log('MASTHEAD - Requesting assets');
 
     assets.forEach(item => {
+      console.log(Request);
       var request = Request({
         uri : this._config.host + item.path,
         method : 'GET'
@@ -87,14 +90,17 @@ const injector = {
       });
 
       Promise.all(requests)
-        .then((responses) => {
-          console.log('MASTHEAD - Assets received');
-
-          resolve({
+        .then(() => {
+          var responses = {
               head: this._getCategory('head', assets),
               body: this._getCategory('body', assets),
               footer: this._getCategory('footer', assets)
-          });
+          }
+
+          GLOBAL.SKY_MASTHEAD = responses;
+          console.log('MASTHEAD - Assets received');
+
+          resolve(responses);
         });
     });
 
