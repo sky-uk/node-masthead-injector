@@ -14,8 +14,7 @@ import masthead from 'masthead';
 
 masthead.get()
   .then(function(assets) {
-    console.log(assets); // Recommended
-    console.log(SKY_MASTHEAD); // Global available as a fallback
+    console.log(assets);
   })
   .catch(function(error) {
     // An asset could not be retrieved

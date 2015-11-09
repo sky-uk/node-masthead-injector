@@ -26,8 +26,6 @@ const injector = {
   _init: function() {
     this.setConfig();
 
-    GLOBAL.SKY_MASTHEAD = null;
-
     this._config.assets.forEach((item) => {
       if (item.path.indexOf(':site-area') !== -1) {
         item.path = item.path.replace(':site-area', this._config.siteArea);
@@ -131,7 +129,6 @@ const injector = {
               footer: this._getCategory('footer', assets)
           }
 
-          GLOBAL.SKY_MASTHEAD = responses;
           console.log('MASTHEAD - Assets received');
 
           resolve(responses);
