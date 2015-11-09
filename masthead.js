@@ -7,12 +7,13 @@ const injector = {
 
   _defaultConfig: {
     host: 'https://assets.sky.com',
+    siteArea: 'help-and-support',
     assets: [{
         section: 'head',
         path: '/resources/mobile-ready/12/css'
     }, {
         section: 'body',
-        path: '/masthead/my-sky'
+        path: '/masthead/:site-area'
     }, {
         section: 'footer',
         path: '/footer'
@@ -26,6 +27,12 @@ const injector = {
     this.setConfig();
 
     GLOBAL.SKY_MASTHEAD = null;
+
+    this._config.assets.forEach((item) => {
+      if (item.path.indexOf(':site-area') !== -1) {
+        item.path = item.path.replace(':site-area', this._config.siteArea);
+      }
+    });
 
     console.log('MASTHEAD - Initialising');
   },
@@ -46,7 +53,6 @@ const injector = {
     console.log('MASTHEAD - Requesting assets');
 
     assets.forEach(item => {
-      console.log(Request);
       var request = Request({
         uri : this._config.host + item.path,
         method : 'GET'
