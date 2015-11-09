@@ -1,8 +1,4 @@
 import Request from 'request-promise';
-import {
-  assign
-}
-from 'lodash';
 
 const injector = {
   _config: null,
@@ -19,19 +15,25 @@ const injector = {
     }, {
       section: 'footer',
       path: '/footer'
+    }, {
+      section: 'footer',
+      path: '/resources/mobile-ready/12/js'
     }]
   },
 
+  _startTime: null,
+
   _init: function() {
+    this._startTime = +(new Date());
     this.setConfig();
 
-    this._config.assets.forEach((item) => {
+    this._config.assets.forEach(item => {
       if (item.path.indexOf(':site-area') !== -1) {
         item.path = item.path.replace(':site-area', this._config.siteArea);
       }
     });
 
-    console.log('MASTHEAD - Initialising');
+    console.log('MASTHEAD - Starting');
   },
 
   _getConfig: function() {
@@ -39,10 +41,12 @@ const injector = {
   },
 
   _requestAsset: function(asset) {
-    console.log('MASTHEAD - Requesting asset - ' + asset.section);
+    console.log('MASTHEAD - Requesting asset - ' + asset.path);
+
     return Request(this._config.host + asset.path)
-      .then(r => {
-        asset.data = r;
+      .then(response => {
+        asset.data = response;
+
         return asset;
       });
   },
@@ -67,7 +71,7 @@ const injector = {
       return this._config;
     }
 
-    this._config = assign({},
+    this._config = Object.assign({},
       this._defaultConfig,
       config
     );
@@ -91,16 +95,29 @@ const injector = {
    * @return {Promise}
    */
   get: function() {
+    var requests = [];
 
     this._init();
 
-    return Promise.all(this._config.assets.map(this._requestAsset.bind(this)))
+    this._config.assets.forEach(item => {
+      requests.push(
+        this._requestAsset(item)
+      )
+    });
+
+    return Promise.all(requests)
       .then(results => {
         let assets = {};
-        results.forEach(r => {
-          assets[r.section] = r.data;
+        let time = +(new Date());
+        results.forEach(response => {
+          if (!assets[response.section]) {
+            assets[response.section] = '';
+          }
+
+          assets[response.section] += response.data;
         });
-        console.log('MASTHEAD - Assets received');
+
+        console.log('MASTHEAD - Assets received (' + (time - this._startTime) / 1000 + 's)');
         return assets;
       })
       .catch(error => {
