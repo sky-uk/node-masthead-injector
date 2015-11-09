@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "./node_modules/.bin/babel-node --harmony index.js",
     "start": "node build/masthead.js",
-    "compile": "babel masthead.js --out-file build/masthead.js",
+    "compile": "babel app/masthead.js --out-file build/masthead.js",
     "test": "mocha --recursive"
   },
   "engines": {
