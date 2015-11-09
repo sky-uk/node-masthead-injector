@@ -111,13 +111,12 @@ const injector = {
    * @return {Promise}
    */
   get: function() {
-    var response,
-      assets,
+    var assets,
       requests;
 
     this._init();
 
-    response = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       assets = this._requestAssets(this._config.assets);
 
       requests = assets.map((item) => {
@@ -146,8 +145,6 @@ const injector = {
           reject(error);
         });
     });
-
-    return response;
   }
 };
 

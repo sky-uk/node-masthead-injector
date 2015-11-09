@@ -63,4 +63,30 @@ describe('Masthead', function() {
       });
     });
   });
+
+  describe('_getCategory', function() {
+    it('Filters by section', function() {
+      var response = masthead._getCategory('body', [{
+        section: 'body',
+        data: '123'
+      }, {
+        section: 'footer',
+        data: '456'
+      }]);
+
+      assert.equal(response, '123');
+    });
+
+    it('Returns the data joined in one string', function() {
+      var response = masthead._getCategory('body', [{
+        section: 'body',
+        data: '123'
+      }, {
+        section: 'body',
+        data: '456'
+      }]);
+
+      assert.equal(response, '123456');
+    });
+  });
 });
