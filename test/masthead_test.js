@@ -1,14 +1,23 @@
 require('babel/register');
 
 var assert = require('assert');
-var _ = require('lodash');
 var proxyquire = require('proxyquire').noCallThru();
-var _masthead = require('../app/masthead.js');
 var masthead;
 
 describe('Masthead', function() {
   beforeEach(function(){
-    masthead = _.clone(_masthead, true);
+    masthead = proxyquire('../app/masthead.js', {
+      'request-promise': function() {
+        return {
+          then: function() {
+            return this;
+          },
+          catch: function() {
+            return this;
+          }
+        };
+      }
+    });
   });
 
   describe('Configuration', function() {
@@ -101,6 +110,43 @@ describe('Masthead', function() {
       }]);
 
       assert.equal(response, '123456');
+    });
+  });
+
+  describe('_requestAssets', function() {
+    it('Fires off requests', function() {
+      var assets = [{
+        path: '/path'
+      }];
+
+      masthead._config = {
+        host: 'host'
+      };
+
+      masthead._requestAssets(assets);
+
+      assert.ok(assets[0].request);
+    });
+  });
+
+  describe('get', function() {
+    it('Initialises the config automatically', function() {
+      masthead._init = function() {
+        assert.ok(true);
+        this._config = {};
+      }
+
+      masthead.get();
+
+      assert.ok(masthead._config);
+    });
+
+    it('Returns a single promise', function() {
+      var response = masthead.get();
+
+      assert.ok(response);
+      assert.ok(response.then);
+      assert.ok(response.catch);
     });
   });
 });
