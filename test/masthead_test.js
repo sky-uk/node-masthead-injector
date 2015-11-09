@@ -3,7 +3,7 @@ require('babel/register');
 var assert = require('assert');
 var _ = require('lodash');
 var proxyquire = require('proxyquire').noCallThru();
-var _masthead = require('../masthead.js');
+var _masthead = require('../app/masthead.js');
 var masthead;
 
 describe('Masthead', function() {
