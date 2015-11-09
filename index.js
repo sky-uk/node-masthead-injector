@@ -1,4 +1,4 @@
-import masthead from './masthead.js';
+import masthead from './app/masthead.js';
 
 masthead.get()
   .then(function(assets) {
