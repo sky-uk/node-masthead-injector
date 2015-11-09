@@ -62,6 +62,20 @@ describe('Masthead', function() {
         }]
       });
     });
+
+    it('Overrides :site-area with the config attribute', function() {
+      masthead._defaultConfig = {
+        host: 'randomhost',
+        siteArea: 'test-area',
+        assets: [{
+          path: '/path/to/file/:site-area'
+        }]
+      };
+
+      masthead._init();
+
+      assert.equal(masthead._config.assets[0].path, '/path/to/file/test-area');
+    });
   });
 
   describe('_getCategory', function() {
