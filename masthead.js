@@ -136,6 +136,12 @@ const injector = {
           console.log('MASTHEAD - Assets received');
 
           resolve(responses);
+        })
+        .catch((error) => {
+          console.log('MASTHEAD - ====== Errror ======');
+          console.log('MASTHEAD - statusCode: ' + error.statusCode);
+          console.log('MASTHEAD - asset: ' + error.options.uri);
+          console.log('MASTHEAD - ====== Errror ======');
         });
     });
 
