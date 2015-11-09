@@ -1,6 +1,8 @@
 import Request from 'request-promise';
-import Promise from 'promise';
-import { assign } from 'lodash';
+import {
+  assign
+}
+from 'lodash';
 
 const injector = {
   _config: null,
@@ -9,17 +11,14 @@ const injector = {
     host: 'https://assets.sky.com',
     siteArea: 'help-and-support',
     assets: [{
-        section: 'head',
-        path: '/resources/mobile-ready/12/css'
+      section: 'head',
+      path: '/resources/mobile-ready/12/css'
     }, {
-        section: 'body',
-        path: '/masthead/:site-area'
+      section: 'body',
+      path: '/masthead/:site-area'
     }, {
-        section: 'footer',
-        path: '/footer'
-    }, {
-        section: 'footer',
-        path: '/resources/mobile-ready/12/js'
+      section: 'footer',
+      path: '/footer'
     }]
   },
 
@@ -39,29 +38,13 @@ const injector = {
     return this._config || this.setConfig();
   },
 
-  _getCategory: function(section, assets) {
-    return assets.filter(item => {
-      return item.section === section ? item : false;
-    }).map(item => {
-      return item.data;
-    }).join('');
-  },
-
-  _requestAssets: function(assets) {
-    console.log('MASTHEAD - Requesting assets');
-
-    assets.forEach(item => {
-      var request = Request({
-        uri : this._config.host + item.path,
-        method : 'GET'
-      }).then(data => {
-        item.data = data;
+  _requestAsset: function(asset) {
+    console.log('MASTHEAD - Requesting asset - ' + asset.section);
+    return Request(this._config.host + asset.path)
+      .then(r => {
+        asset.data = r;
+        return asset;
       });
-
-      item.request = request;
-    });
-
-    return assets;
   },
 
   /**
@@ -84,8 +67,7 @@ const injector = {
       return this._config;
     }
 
-    this._config = assign(
-      {},
+    this._config = assign({},
       this._defaultConfig,
       config
     );
@@ -109,39 +91,25 @@ const injector = {
    * @return {Promise}
    */
   get: function() {
-    var assets,
-      requests;
 
     this._init();
 
-    return new Promise((resolve, reject) => {
-      assets = this._requestAssets(this._config.assets);
-
-      requests = assets.map((item) => {
-        return item.request;
+    return Promise.all(this._config.assets.map(this._requestAsset.bind(this)))
+      .then(results => {
+        let assets = {};
+        results.forEach(r => {
+          assets[r.section] = r.data;
+        });
+        console.log('MASTHEAD - Assets received');
+        return assets;
+      })
+      .catch(error => {
+        console.log('MASTHEAD - ====== Error ======');
+        console.log(`MASTHEAD - statusCode: ${error.statusCode}`);
+        console.log(`MASTHEAD - asset: ${error.options.uri}`);
+        console.log('MASTHEAD - ====== Error ======');
       });
 
-      Promise.all(requests)
-        .then(() => {
-          var responses = {
-              head: this._getCategory('head', assets),
-              body: this._getCategory('body', assets),
-              footer: this._getCategory('footer', assets)
-          }
-
-          console.log('MASTHEAD - Assets received');
-
-          resolve(responses);
-        })
-        .catch((error) => {
-          console.log('MASTHEAD - ====== Errror ======');
-          console.log('MASTHEAD - statusCode: ' + error.statusCode);
-          console.log('MASTHEAD - asset: ' + error.options.uri);
-          console.log('MASTHEAD - ====== Errror ======');
-
-          reject(error);
-        });
-    });
   }
 };
 

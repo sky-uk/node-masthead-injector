@@ -5,15 +5,15 @@ var proxyquire = require('proxyquire').noCallThru();
 var masthead;
 
 describe('Masthead', function() {
-  beforeEach(function(){
+  beforeEach(function() {
     masthead = proxyquire('../app/masthead.js', {
       'request-promise': function() {
         return {
           then: function() {
-            return this;
+            return Promise.resolve();
           },
           catch: function() {
-            return this;
+            return Promise.reject();
           }
         };
       }
@@ -39,7 +39,7 @@ describe('Masthead', function() {
       masthead._defaultConfig = {
         host: 'randomhost',
         assets: []
-      }
+      };
       masthead.setConfig({
         host: 'testinghost'
       });
@@ -54,7 +54,7 @@ describe('Masthead', function() {
       masthead._defaultConfig = {
         host: 'randomhost',
         assets: []
-      }
+      };
       masthead.setConfig({
         host: 'testinghost',
         assets: [{
@@ -87,45 +87,19 @@ describe('Masthead', function() {
     });
   });
 
-  describe('_getCategory', function() {
-    it('Filters by section', function() {
-      var response = masthead._getCategory('body', [{
-        section: 'body',
-        data: '123'
-      }, {
-        section: 'footer',
-        data: '456'
-      }]);
-
-      assert.equal(response, '123');
-    });
-
-    it('Returns the data joined in one string', function() {
-      var response = masthead._getCategory('body', [{
-        section: 'body',
-        data: '123'
-      }, {
-        section: 'body',
-        data: '456'
-      }]);
-
-      assert.equal(response, '123456');
-    });
-  });
-
-  describe('_requestAssets', function() {
-    it('Fires off requests', function() {
-      var assets = [{
-        path: '/path'
-      }];
+  describe('_requestAsset', function() {
+    it('Fires off a request', function(done) {
+      var asset = {
+        path: '/path',
+        section: 'test',
+      };
 
       masthead._config = {
         host: 'host'
       };
 
-      masthead._requestAssets(assets);
-
-      assert.ok(assets[0].request);
+      masthead._requestAsset(asset).then(done)
+        .catch(done);
     });
   });
 
@@ -133,8 +107,10 @@ describe('Masthead', function() {
     it('Initialises the config automatically', function() {
       masthead._init = function() {
         assert.ok(true);
-        this._config = {};
-      }
+        this._config = {
+          assets: []
+        };
+      };
 
       masthead.get();
 
