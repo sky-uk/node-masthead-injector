@@ -142,6 +142,8 @@ const injector = {
           console.log('MASTHEAD - statusCode: ' + error.statusCode);
           console.log('MASTHEAD - asset: ' + error.options.uri);
           console.log('MASTHEAD - ====== Errror ======');
+
+          reject(error);
         });
     });
 
