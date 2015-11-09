@@ -1,6 +1,4 @@
 import Request from 'request-promise';
-import Promise from 'promise';
-import { assign } from 'lodash';
 
 const injector = {
   _config: null,
@@ -9,59 +7,48 @@ const injector = {
     host: 'https://assets.sky.com',
     siteArea: 'help-and-support',
     assets: [{
-        section: 'head',
-        path: '/resources/mobile-ready/12/css'
+      section: 'head',
+      path: '/resources/mobile-ready/12/css'
     }, {
-        section: 'body',
-        path: '/masthead/:site-area'
+      section: 'body',
+      path: '/masthead/:site-area'
     }, {
-        section: 'footer',
-        path: '/footer'
+      section: 'footer',
+      path: '/footer'
     }, {
-        section: 'footer',
-        path: '/resources/mobile-ready/12/js'
+      section: 'footer',
+      path: '/resources/mobile-ready/12/js'
     }]
   },
 
+  _startTime: null,
+
   _init: function() {
+    this._startTime = +(new Date());
     this.setConfig();
 
-    this._config.assets.forEach((item) => {
+    this._config.assets.forEach(item => {
       if (item.path.indexOf(':site-area') !== -1) {
         item.path = item.path.replace(':site-area', this._config.siteArea);
       }
     });
 
-    console.log('MASTHEAD - Initialising');
+    console.log('MASTHEAD - Starting');
   },
 
   _getConfig: function() {
     return this._config || this.setConfig();
   },
 
-  _getCategory: function(section, assets) {
-    return assets.filter(item => {
-      return item.section === section ? item : false;
-    }).map(item => {
-      return item.data;
-    }).join('');
-  },
+  _requestAsset: function(asset) {
+    console.log('MASTHEAD - Requesting asset - ' + asset.path);
 
-  _requestAssets: function(assets) {
-    console.log('MASTHEAD - Requesting assets');
+    return Request(this._config.host + asset.path)
+      .then(response => {
+        asset.data = response;
 
-    assets.forEach(item => {
-      var request = Request({
-        uri : this._config.host + item.path,
-        method : 'GET'
-      }).then(data => {
-        item.data = data;
+        return asset;
       });
-
-      item.request = request;
-    });
-
-    return assets;
   },
 
   /**
@@ -84,8 +71,7 @@ const injector = {
       return this._config;
     }
 
-    this._config = assign(
-      {},
+    this._config = Object.assign({},
       this._defaultConfig,
       config
     );
@@ -109,39 +95,38 @@ const injector = {
    * @return {Promise}
    */
   get: function() {
-    var assets,
-      requests;
+    var requests = [];
 
     this._init();
 
-    return new Promise((resolve, reject) => {
-      assets = this._requestAssets(this._config.assets);
+    this._config.assets.forEach(item => {
+      requests.push(
+        this._requestAsset(item)
+      )
+    });
 
-      requests = assets.map((item) => {
-        return item.request;
-      });
-
-      Promise.all(requests)
-        .then(() => {
-          var responses = {
-              head: this._getCategory('head', assets),
-              body: this._getCategory('body', assets),
-              footer: this._getCategory('footer', assets)
+    return Promise.all(requests)
+      .then(results => {
+        let assets = {};
+        let time = +(new Date());
+        results.forEach(response => {
+          if (!assets[response.section]) {
+            assets[response.section] = '';
           }
 
-          console.log('MASTHEAD - Assets received');
-
-          resolve(responses);
-        })
-        .catch((error) => {
-          console.log('MASTHEAD - ====== Errror ======');
-          console.log('MASTHEAD - statusCode: ' + error.statusCode);
-          console.log('MASTHEAD - asset: ' + error.options.uri);
-          console.log('MASTHEAD - ====== Errror ======');
-
-          reject(error);
+          assets[response.section] += response.data;
         });
-    });
+
+        console.log('MASTHEAD - Assets received (' + (time - this._startTime) / 1000 + 's)');
+        return assets;
+      })
+      .catch(error => {
+        console.log('MASTHEAD - ====== Error ======');
+        console.log(`MASTHEAD - statusCode: ${error.statusCode}`);
+        console.log(`MASTHEAD - asset: ${error.options.uri}`);
+        console.log('MASTHEAD - ====== Error ======');
+      });
+
   }
 };
 

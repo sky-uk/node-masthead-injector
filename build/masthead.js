@@ -10,12 +10,6 @@ var _requestPromise = require('request-promise');
 
 var _requestPromise2 = _interopRequireDefault(_requestPromise);
 
-var _promise = require('promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
-var _lodash = require('lodash');
-
 var injector = {
   _config: null,
 
@@ -37,9 +31,12 @@ var injector = {
     }]
   },
 
+  _startTime: null,
+
   _init: function _init() {
     var _this = this;
 
+    this._startTime = +new Date();
     this.setConfig();
 
     this._config.assets.forEach(function (item) {
@@ -48,38 +45,21 @@ var injector = {
       }
     });
 
-    console.log('MASTHEAD - Initialising');
+    console.log('MASTHEAD - Starting');
   },
 
   _getConfig: function _getConfig() {
     return this._config || this.setConfig();
   },
 
-  _getCategory: function _getCategory(section, assets) {
-    return assets.filter(function (item) {
-      return item.section === section ? item : false;
-    }).map(function (item) {
-      return item.data;
-    }).join('');
-  },
+  _requestAsset: function _requestAsset(asset) {
+    console.log('MASTHEAD - Requesting asset - ' + asset.path);
 
-  _requestAssets: function _requestAssets(assets) {
-    var _this2 = this;
+    return (0, _requestPromise2['default'])(this._config.host + asset.path).then(function (response) {
+      asset.data = response;
 
-    console.log('MASTHEAD - Requesting assets');
-
-    assets.forEach(function (item) {
-      var request = (0, _requestPromise2['default'])({
-        uri: _this2._config.host + item.path,
-        method: 'GET'
-      }).then(function (data) {
-        item.data = data;
-      });
-
-      item.request = request;
+      return asset;
     });
-
-    return assets;
   },
 
   /**
@@ -102,7 +82,7 @@ var injector = {
       return this._config;
     }
 
-    this._config = (0, _lodash.assign)({}, this._defaultConfig, config);
+    this._config = Object.assign({}, this._defaultConfig, config);
 
     return this._config;
   },
@@ -123,37 +103,34 @@ var injector = {
    * @return {Promise}
    */
   get: function get() {
-    var _this3 = this;
+    var _this2 = this;
 
-    var assets, requests;
+    var requests = [];
 
     this._init();
 
-    return new _promise2['default'](function (resolve, reject) {
-      assets = _this3._requestAssets(_this3._config.assets);
+    this._config.assets.forEach(function (item) {
+      requests.push(_this2._requestAsset(item));
+    });
 
-      requests = assets.map(function (item) {
-        return item.request;
+    return Promise.all(requests).then(function (results) {
+      var assets = {};
+      var time = +new Date();
+      results.forEach(function (response) {
+        if (!assets[response.section]) {
+          assets[response.section] = '';
+        }
+
+        assets[response.section] += response.data;
       });
 
-      _promise2['default'].all(requests).then(function () {
-        var responses = {
-          head: _this3._getCategory('head', assets),
-          body: _this3._getCategory('body', assets),
-          footer: _this3._getCategory('footer', assets)
-        };
-
-        console.log('MASTHEAD - Assets received');
-
-        resolve(responses);
-      })['catch'](function (error) {
-        console.log('MASTHEAD - ====== Errror ======');
-        console.log('MASTHEAD - statusCode: ' + error.statusCode);
-        console.log('MASTHEAD - asset: ' + error.options.uri);
-        console.log('MASTHEAD - ====== Errror ======');
-
-        reject(error);
-      });
+      console.log('MASTHEAD - Assets received (' + (time - _this2._startTime) / 1000 + 's)');
+      return assets;
+    })['catch'](function (error) {
+      console.log('MASTHEAD - ====== Error ======');
+      console.log('MASTHEAD - statusCode: ' + error.statusCode);
+      console.log('MASTHEAD - asset: ' + error.options.uri);
+      console.log('MASTHEAD - ====== Error ======');
     });
   }
 };
