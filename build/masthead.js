@@ -127,11 +127,11 @@ var injector = {
   get: function get() {
     var _this3 = this;
 
-    var response, assets, requests;
+    var assets, requests;
 
     this._init();
 
-    response = new _promise2['default'](function (resolve, reject) {
+    return new _promise2['default'](function (resolve, reject) {
       assets = _this3._requestAssets(_this3._config.assets);
 
       requests = assets.map(function (item) {
@@ -149,10 +149,15 @@ var injector = {
         console.log('MASTHEAD - Assets received');
 
         resolve(responses);
+      })['catch'](function (error) {
+        console.log('MASTHEAD - ====== Errror ======');
+        console.log('MASTHEAD - statusCode: ' + error.statusCode);
+        console.log('MASTHEAD - asset: ' + error.options.uri);
+        console.log('MASTHEAD - ====== Errror ======');
+
+        reject(error);
       });
     });
-
-    return response;
   }
 };
 
