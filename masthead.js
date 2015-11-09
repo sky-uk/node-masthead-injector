@@ -66,6 +66,20 @@ const injector = {
     return assets;
   },
 
+  /**
+   * Allows you to override the default config.
+   * Should be called before get()
+   * @param {Object} config
+   *
+   * {
+   *   host: '',
+   *   siteArea: '',
+   *   assets: [{
+   *     section: 'head',
+   *     path: '/path/to/file'
+   *   }]
+   * }
+   */
   setConfig: function(config) {
     if (!config) {
       this._config = this._defaultConfig;
@@ -81,6 +95,21 @@ const injector = {
     return this._config;
   },
 
+  /**
+   * Returns a promise for the assets
+   * Promise resolves with:
+   *
+   * {
+   *   head: '<link href="path/to/file.css />"',
+   *   body: '<div class="dropdown></div>',
+   *   footer: '<div class="contact-us></div>'
+   * }
+   *
+   * You can also use the global SKY_MASTHEAD if your app
+   * can not be updated to the format described above.
+   *
+   * @return {Promise}
+   */
   get: function() {
     var response,
       assets,
