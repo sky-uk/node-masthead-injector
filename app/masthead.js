@@ -6,6 +6,7 @@ const injector = {
   _defaultConfig: {
     host: 'https://assets.sky.com',
     siteArea: 'help-and-support',
+    debug: false,
     assets: [{
       section: 'head',
       path: '/resources/mobile-ready/12/css'
@@ -33,15 +34,21 @@ const injector = {
       }
     });
 
-    console.log('MASTHEAD - Starting');
+    this._log('MASTHEAD - Starting');
   },
 
   _getConfig: function() {
     return this._config || this.setConfig();
   },
 
+  _log: function(message) {
+    if (this._config.debug) {
+      console.log(message);
+    }
+  },
+
   _requestAsset: function(asset) {
-    console.log('MASTHEAD - Requesting asset - ' + asset.path);
+    this._log('MASTHEAD - Requesting asset - ' + asset.path);
 
     return Request(this._config.host + asset.path)
       .then(response => {
@@ -117,14 +124,14 @@ const injector = {
           assets[response.section] += response.data;
         });
 
-        console.log('MASTHEAD - Assets received (' + (time - this._startTime) / 1000 + 's)');
+        this._log('MASTHEAD - Assets received (' + (time - this._startTime) / 1000 + 's)');
         return assets;
       })
       .catch(error => {
-        console.log('MASTHEAD - ====== Error ======');
-        console.log(`MASTHEAD - statusCode: ${error.statusCode}`);
-        console.log(`MASTHEAD - asset: ${error.options.uri}`);
-        console.log('MASTHEAD - ====== Error ======');
+        this._log('MASTHEAD - ====== Error ======');
+        this._log(`MASTHEAD - statusCode: ${error.statusCode}`);
+        this._log(`MASTHEAD - asset: ${error.options.uri}`);
+        this._log('MASTHEAD - ====== Error ======');
       });
 
   }
