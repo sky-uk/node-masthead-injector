@@ -14,34 +14,56 @@ var injector = {
   _config: null,
 
   _defaultConfig: {
-    host: 'https://assets.sky.com',
+    host: 'https://assets.sky.com/new',
     siteArea: 'help-and-support',
+    debug: false,
     assets: [{
       section: 'head',
-      path: '/resources/mobile-ready/12/css'
+      path: '/masthead/meta'
     }, {
       section: 'body',
-      path: '/masthead/:site-area'
+      path: '/masthead/header/:site-area/:country'
     }, {
       section: 'footer',
-      path: '/footer'
+      path: '/masthead/footer/:country'
     }, {
       section: 'footer',
-      path: '/resources/mobile-ready/12/js'
+      path: '/masthead/js'
     }]
   },
+  // _defaultConfig: {
+  //   host: 'https://assets.sky.com/new',
+  //   siteArea: 'help-and-support',
+  //   debug: false,
+  //   assets: [{
+  //     section: 'head',
+  //     path: '/resources/css'
+  //   }, {
+  //     section: 'body',
+  //     path: '/masthead/:site-area'
+  //   }, {
+  //     section: 'footer',
+  //     path: '/footer'
+  //   }, {
+  //     section: 'footer',
+  //     path: '/resources/js'
+  //   }]
+  // },
 
   _startTime: null,
 
-  _init: function _init() {
-    var _this = this;
-
-    this._startTime = +new Date();
+  _init: function() {
+    this._startTime = +(new Date());
     this.setConfig();
 
-    this._config.assets.forEach(function (item) {
+    this._config.country = this._config.country ? this._config.country : 'gb';
+
+    this._config.assets.forEach(item => {
       if (item.path.indexOf(':site-area') !== -1) {
-        item.path = item.path.replace(':site-area', _this._config.siteArea);
+        item.path = item.path.replace(':site-area', this._config.siteArea);
+      }
+      if (item.path.indexOf(':country') !== -1) {
+        item.path = item.path.replace(':country', this._config.country);
       }
     });
 
