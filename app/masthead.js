@@ -4,21 +4,21 @@ const injector = {
   _config: null,
 
   _defaultConfig: {
-    host: 'https://assets.sky.com',
+    host: 'https://assets.sky.com/new',
     siteArea: 'help-and-support',
     debug: false,
     assets: [{
       section: 'head',
-      path: '/resources/mobile-ready/12/css'
+      path: '/resources/css'
     }, {
       section: 'body',
-      path: '/masthead/:site-area'
+      path: '/masthead/help-and-support'
     }, {
       section: 'footer',
       path: '/footer'
     }, {
       section: 'footer',
-      path: '/resources/mobile-ready/12/js'
+      path: '/resources/js'
     }]
   },
 
