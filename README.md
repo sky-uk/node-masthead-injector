@@ -1,5 +1,7 @@
 # node-masthead-injector
 
+v 0.0.5
+
 ##### Purpose
 
 To provide an simple interface to the masthead API within node.
