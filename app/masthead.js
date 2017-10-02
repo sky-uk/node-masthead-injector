@@ -11,13 +11,13 @@ const injector = {
       section: 'head',
       path: '/resources/css'
     }, {
-      section: 'body',
+      section: 'header',
       path: '/masthead/help-and-support'
     }, {
       section: 'footer',
       path: '/footer'
     }, {
-      section: 'footer',
+      section: 'js',
       path: '/resources/js'
     }]
   },
