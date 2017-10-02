@@ -39,20 +39,20 @@ masthead.get()
 You can override these attributes by calling `masthead.setConfig()` before calling `masthead.get()`. Pass in an object to override individual attributes or the entire object.
 ```
 {
-    host: 'https://assets.sky.com',
+    host: 'https://assets.sky.com/new',
     siteArea: 'help-and-support',
     assets: [{
-        section: 'head',
-        path: '/resources/mobile-ready/12/css'
+      section: 'head',
+      path: '/resources/css'
     }, {
-        section: 'body',
-        path: '/masthead/:site-area'
+      section: 'header',
+      path: '/masthead/help-and-support'
     }, {
-        section: 'footer',
-        path: '/footer'
+      section: 'footer',
+      path: '/footer'
     }, {
-        section: 'footer',
-        path: '/resources/mobile-ready/12/js'
+      section: 'js',
+      path: '/resources/js'
     }]
   }
   ```
