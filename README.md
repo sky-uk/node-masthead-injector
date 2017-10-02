@@ -1,6 +1,6 @@
 # node-masthead-injector
 
-v 0.0.5
+v0.1.0
 
 ##### Purpose
 
