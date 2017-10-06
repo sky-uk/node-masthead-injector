@@ -50,12 +50,11 @@ const injector = {
   _requestAsset: function(asset) {
     this._log('MASTHEAD - Requesting asset - ' + asset.path);
 
-    return Request(this._config.host + asset.path)
-      .then(response => {
-        asset.data = response;
+    return Request(this._config.host + asset.path).then(response => {
+      asset.data = response;
 
-        return asset;
-      });
+      return asset;
+    });
   },
 
   /**
@@ -73,11 +72,6 @@ const injector = {
    * }
    */
   setConfig: function(config) {
-    if (!config) {
-      this._config = this._defaultConfig;
-      return this._config;
-    }
-
     this._config = Object.assign({},
       this._defaultConfig,
       config
@@ -102,20 +96,18 @@ const injector = {
    * @return {Promise}
    */
   get: function() {
-    var requests = [];
+    const requests = [];
 
     this._init();
 
     this._config.assets.forEach(item => {
-      requests.push(
-        this._requestAsset(item)
-      )
+      requests.push(this._requestAsset(item))
     });
 
     return Promise.all(requests)
       .then(results => {
-        let assets = {};
-        let time = +(new Date());
+        const assets = {};
+        const time = +(new Date());
         results.forEach(response => {
           if (!assets[response.section]) {
             assets[response.section] = '';
