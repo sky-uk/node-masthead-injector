@@ -42,9 +42,7 @@ const injector = {
   },
 
   _log: function(message) {
-    if (this._config.debug) {
-      console.log(message);
-    }
+    if (this._config.debug) console.log(message);
   },
 
   _requestAsset: function(asset) {
@@ -122,7 +120,7 @@ const injector = {
       .catch(error => {
         this._log('MASTHEAD - ====== Error ======');
         this._log(`MASTHEAD - statusCode: ${error.statusCode}`);
-        this._log(`MASTHEAD - asset: ${error.options.uri}`);
+        this._log(`MASTHEAD - asset: ${(error.options || {}).uri}`);
         this._log('MASTHEAD - ====== Error ======');
       });
 
