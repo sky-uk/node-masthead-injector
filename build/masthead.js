@@ -46,15 +46,21 @@ var injector = {
       }
     });
 
-    console.log('MASTHEAD - Starting');
+    this._log('MASTHEAD - Starting');
   },
 
   _getConfig: function _getConfig() {
     return this._config || this.setConfig();
   },
 
+  _log: function _log(message) {
+    if (this._config.debug) {
+      console.log(message);
+    }
+  },
+
   _requestAsset: function _requestAsset(asset) {
-    console.log('MASTHEAD - Requesting asset - ' + asset.path);
+    this._log('MASTHEAD - Requesting asset - ' + asset.path);
 
     return (0, _requestPromise2['default'])(this._config.host + asset.path).then(function (response) {
       asset.data = response;
@@ -78,11 +84,6 @@ var injector = {
    * }
    */
   setConfig: function setConfig(config) {
-    if (!config) {
-      this._config = this._defaultConfig;
-      return this._config;
-    }
-
     this._config = Object.assign({}, this._defaultConfig, config);
 
     return this._config;
@@ -125,13 +126,13 @@ var injector = {
         assets[response.section] += response.data;
       });
 
-      console.log('MASTHEAD - Assets received (' + (time - _this2._startTime) / 1000 + 's)');
+      _this2._log('MASTHEAD - Assets received (' + (time - _this2._startTime) / 1000 + 's)');
       return assets;
     })['catch'](function (error) {
-      console.log('MASTHEAD - ====== Error ======');
-      console.log('MASTHEAD - statusCode: ' + error.statusCode);
-      console.log('MASTHEAD - asset: ' + error.options.uri);
-      console.log('MASTHEAD - ====== Error ======');
+      _this2._log('MASTHEAD - ====== Error ======');
+      _this2._log('MASTHEAD - statusCode: ' + error.statusCode);
+      _this2._log('MASTHEAD - asset: ' + error.options.uri);
+      _this2._log('MASTHEAD - ====== Error ======');
     });
   }
 };

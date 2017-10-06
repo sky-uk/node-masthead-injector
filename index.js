@@ -1,6 +1,6 @@
 import masthead from './app/masthead.js';
 
 masthead.get()
-  .then(function(assets) {
+  .then((assets) => {
     console.log(assets);
   });
