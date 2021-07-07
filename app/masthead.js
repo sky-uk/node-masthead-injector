@@ -26,7 +26,9 @@ const injector = {
 
   _init: function() {
     this._startTime = +(new Date());
-    this.setConfig();
+    if (!this._config) {
+      this.setConfig();
+    }
 
     this._config.assets.forEach(item => {
       if (item.path.indexOf(':site-area') !== -1) {
@@ -50,7 +52,12 @@ const injector = {
   _requestAsset: function(asset) {
     this._log('MASTHEAD - Requesting asset - ' + asset.path);
 
-    return Request(this._config.host + asset.path)
+    var options = {
+      uri: this._config.host + asset.path,
+      headers: this._config.headers
+    }
+
+    return Request(options)
       .then(response => {
         asset.data = response;
 
