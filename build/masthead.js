@@ -38,7 +38,9 @@ var injector = {
     var _this = this;
 
     this._startTime = +new Date();
-    this.setConfig();
+    if (!this._config) {
+      this.setConfig();
+    }
 
     this._config.assets.forEach(function (item) {
       if (item.path.indexOf(':site-area') !== -1) {
@@ -46,17 +48,28 @@ var injector = {
       }
     });
 
-    console.log('MASTHEAD - Starting');
+    this._log('MASTHEAD - Starting');
   },
 
   _getConfig: function _getConfig() {
     return this._config || this.setConfig();
   },
 
-  _requestAsset: function _requestAsset(asset) {
-    console.log('MASTHEAD - Requesting asset - ' + asset.path);
+  _log: function _log(message) {
+    if (this._config.debug) {
+      console.log(message);
+    }
+  },
 
-    return (0, _requestPromise2['default'])(this._config.host + asset.path).then(function (response) {
+  _requestAsset: function _requestAsset(asset) {
+    this._log('MASTHEAD - Requesting asset - ' + asset.path);
+
+    var options = {
+      uri: this._config.host + asset.path,
+      headers: this._config.headers
+    };
+
+    return (0, _requestPromise2['default'])(options).then(function (response) {
       asset.data = response;
 
       return asset;
@@ -125,13 +138,13 @@ var injector = {
         assets[response.section] += response.data;
       });
 
-      console.log('MASTHEAD - Assets received (' + (time - _this2._startTime) / 1000 + 's)');
+      _this2._log('MASTHEAD - Assets received (' + (time - _this2._startTime) / 1000 + 's)');
       return assets;
     })['catch'](function (error) {
-      console.log('MASTHEAD - ====== Error ======');
-      console.log('MASTHEAD - statusCode: ' + error.statusCode);
-      console.log('MASTHEAD - asset: ' + error.options.uri);
-      console.log('MASTHEAD - ====== Error ======');
+      _this2._log('MASTHEAD - ====== Error ======');
+      _this2._log('MASTHEAD - statusCode: ' + error.statusCode);
+      _this2._log('MASTHEAD - asset: ' + error.options.uri);
+      _this2._log('MASTHEAD - ====== Error ======');
     });
   }
 };
